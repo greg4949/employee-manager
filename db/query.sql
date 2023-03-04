@@ -45,7 +45,7 @@ VALUES ('Head of Security',115000,5),
 
 INSERT INTO employee (first_name,last_name,role_id,mgr_id)
 VALUES ('John','McLane',9,NULL),
-        ('Paul','Blart',10,9);
+        ('Paul','Blart',NULL,9);
 
 
 /*View all departments*/
@@ -84,4 +84,26 @@ LEFT JOIN employee m on e.mgr_id=m.emp_id;
         
 
 /*Update employee role*/
+
+UPDATE employee
+SET 
+    role_id = '10'
+
+WHERE emp_id = '10';
+
+
+/*View all employees*/
+
+SELECT e.emp_id
+,e.first_name
+,e.last_name
+,r.title
+,d.dept_name
+,r.salary
+,CONCAT(m.first_name,' ',m.last_name) as 'Manager'
+
+FROM employee e
+LEFT JOIN roles r on e.role_id=r.role_id
+LEFT JOIN departments d on r.dept_id=d.dept_id
+LEFT JOIN employee m on e.mgr_id=m.emp_id;
 
