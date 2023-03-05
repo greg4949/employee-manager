@@ -2,7 +2,7 @@ const inquirer = require('inquirer');
 const mysql = require('mysql2');
 
 
-
+//
 const menuOptions = {
     viewDepts: 'View all departments',
     viewRoles: 'View all roles',
@@ -12,7 +12,6 @@ const menuOptions = {
     addEmp: 'Add an employee',
     updEmpRole : 'Update employee Role',
     exit: 'Exit'
-
 }
 
 const db = mysql.createConnection(
@@ -62,6 +61,21 @@ function menu() {
                     vEmps();
                     break;
                 
+                case menuOptions.addDept:
+                    aDept();
+                    break;
+                case menuOptions.addRole:
+                    aRole();
+                    break;
+                
+                case menuOptions.addEmp:
+                    aEmp();
+                    break;
+
+                case menuOptions.updEmpRole:
+                    uEmpRole();
+                    break;
+
                 case menuOptions.exit:
                     db.end();
                     break
@@ -74,7 +88,7 @@ function vDepts() {
     const selDepts =`SELECT * FROM departments;`;
     db.query(selDepts, (err,res)=> {
         if (err) {
-            console.log('Check your sql syntax');
+            console.log('Error. Check your sql syntax');
             return;
         }
         console.table(res);
@@ -109,7 +123,7 @@ function vEmps() {
     LEFT JOIN employee m on e.mgr_id=m.emp_id`;
     db.query(selEmps, (err,res)=> {
         if (err) {
-            console.log('Check your sql syntax');
+            console.log('Error.  Check your sql syntax');
             return;
         }
         console.table(res);
@@ -117,8 +131,126 @@ function vEmps() {
     })
 }
 
-function aDept() {
-    const addDept =`INSERT INTO departments (dept_name)
-    VALUES ('Security');`
+async function aDept() {
+    const promptDept = await inquirer.prompt(inputDept());
+    const insDept = `INSERT INTO departments (dept_name) VALUES (?)`;
+    const newDept = promptDept.department
+    db.query(insDept, newDept, (err,res) => {
+        if (err) {console.log('Error. Check your sql syntax')
+                console.log(`${newDept}`);
+        return;
+    }
+    console.log('New department added successfuly');
+    menu();
+    })
 }
 
+async function aRole() {
+    const promptRole = await inquirer.prompt(inputRole());
+    const insRole = `INSERT INTO roles (title, salary, dept_id) VALUES (?,?,?)`;
+    const newRole = [promptRole.title,promptRole.salary,promptRole.dept_id];
+    db.query(insRole, newRole, (err,res) => {
+        if (err) {console.log('Error. Check your sql syntax')
+                console.log(`${newRole}`);
+        return;
+    }
+    console.log('New role added successfuly');
+    menu();
+    })
+};
+
+async function aEmp() {
+    const promptEmp = await inquirer.prompt(inputEmp());
+    const insEmp = `INSERT INTO employee (first_name, last_name, mgr_id, role_id) VALUES (?,?,?,?)`;
+    const newEmp = [promptEmp.first_name, promptEmp.last_name, promptEmp.mgr_id, promptEmp.role_id];
+    db.query(insEmp, newEmp, (err,res) => {
+        if (err) {console.log('Error. Check your sql syntax')
+                console.log(`${newEmp}`);
+        return;
+    }
+    console.log('New employee added successfuly');
+    menu();
+    })
+};
+
+async function uEmpRole() {
+    const promptEmpRole = await inquirer.prompt(updateEmpRole());
+    const udpateEmpRole = `UPDATE employee SET role_id = ? WHERE emp_id = ?`;
+    const newEmpRole = [promptEmpRole.role_id, promptEmpRole.emp_id];
+    db.query(udpateEmpRole, newEmpRole, (err,res) => {
+        if (err) {console.log('Error. Check your sql syntax')
+                console.log(`${newEmpRole}`);
+        return;
+    }
+    console.log('Employee role changed successfuly');
+    menu();
+    })
+}
+function inputDept() {
+    return ([
+        {
+        name: "department",
+        type: "input",
+        message: "Enter new department name:"}
+    ])
+};
+
+function inputRole() {
+    return ([
+        {
+        name: "title",
+        type: "input",
+        message: "Enter new role title:"
+        },
+        {
+        name: "salary",
+        type: "input",
+        message: "Enter salary of new role"
+        },
+        {
+        name: "dept_id",
+        type: "input",
+        message: "Enter dept id for new role"
+        }
+    ])
+};
+
+function inputEmp() {
+    return ([
+        {
+        name: "first_name",
+        type: "input",
+        message: "Enter new employee first name:"
+        },
+        {
+        name: "last_name",
+        type: "input",
+        message: "Enter new employee last name"
+        },
+        {
+        name: "mgr_id",
+        type: "input",
+        message: "Enter new employee manager id"
+        },
+        {
+        name: "role_id",
+        type: "input",
+        message: "Enter new employee role id"
+        }
+    ])
+}
+
+function updateEmpRole() {
+    return ([       
+        {
+        name: "emp_id",
+        type: "input",
+        message: "Enter employee id whose role will be changed:"
+        },        
+        {
+        name: "role_id",
+        type: "input",
+        message: "Enter employee's updated role id:"
+        }
+    ])
+};
