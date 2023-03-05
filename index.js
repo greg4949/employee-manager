@@ -2,7 +2,7 @@ const inquirer = require('inquirer');
 const mysql = require('mysql2');
 
 
-//
+//create list of menu options for application
 const menuOptions = {
     viewDepts: 'View all departments',
     viewRoles: 'View all roles',
@@ -14,6 +14,8 @@ const menuOptions = {
     exit: 'Exit'
 }
 
+
+//connect to mysql database
 const db = mysql.createConnection(
     {
       host: "localhost",
@@ -30,6 +32,8 @@ db.connect(err => {
     menu();
 });
 
+
+//Display menu of options for application, allow user to choose menu option, and run function associated with selected menu option
 function menu() {
     inquirer
         .prompt({
@@ -84,6 +88,8 @@ function menu() {
         })
 }
 
+
+//show list of all departments
 function vDepts() {
     const selDepts =`SELECT * FROM departments;`;
     db.query(selDepts, (err,res)=> {
@@ -96,6 +102,7 @@ function vDepts() {
     })
 }
 
+//show list of all roles
 function vRoles() {
     const selRoles =`SELECT * FROM roles;`;
     db.query(selRoles, (err,res)=> {
@@ -108,6 +115,7 @@ function vRoles() {
     })
 }
 
+//show list of all employees
 function vEmps() {
     const selEmps =`SELECT e.emp_id
     ,e.first_name
@@ -131,6 +139,7 @@ function vEmps() {
     })
 }
 
+//add new department
 async function aDept() {
     const promptDept = await inquirer.prompt(inputDept());
     const insDept = `INSERT INTO departments (dept_name) VALUES (?)`;
@@ -145,6 +154,7 @@ async function aDept() {
     })
 }
 
+//add new role
 async function aRole() {
     const promptRole = await inquirer.prompt(inputRole());
     const insRole = `INSERT INTO roles (title, salary, dept_id) VALUES (?,?,?)`;
@@ -159,6 +169,7 @@ async function aRole() {
     })
 };
 
+//add new employee
 async function aEmp() {
     const promptEmp = await inquirer.prompt(inputEmp());
     const insEmp = `INSERT INTO employee (first_name, last_name, mgr_id, role_id) VALUES (?,?,?,?)`;
@@ -173,6 +184,7 @@ async function aEmp() {
     })
 };
 
+//update employee role
 async function uEmpRole() {
     const promptEmpRole = await inquirer.prompt(updateEmpRole());
     const udpateEmpRole = `UPDATE employee SET role_id = ? WHERE emp_id = ?`;
@@ -186,6 +198,8 @@ async function uEmpRole() {
     menu();
     })
 }
+
+//ask user for new department info
 function inputDept() {
     return ([
         {
@@ -195,6 +209,7 @@ function inputDept() {
     ])
 };
 
+//ask user for new Role info
 function inputRole() {
     return ([
         {
@@ -215,6 +230,7 @@ function inputRole() {
     ])
 };
 
+//ask user for new employee info
 function inputEmp() {
     return ([
         {
@@ -240,6 +256,7 @@ function inputEmp() {
     ])
 }
 
+//ask user for updated employee role_id
 function updateEmpRole() {
     return ([       
         {

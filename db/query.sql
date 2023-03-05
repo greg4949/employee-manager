@@ -1,3 +1,6 @@
+/*test file to run all needed queries for application*/
+
+
 /*View all departments*/
 
 SELECT *
