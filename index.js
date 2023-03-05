@@ -61,6 +61,10 @@ function menu() {
                 case menuOptions.viewEmps:
                     vEmps();
                     break;
+                
+                case menuOptions.exit:
+                    db.end();
+                    break
 
             }
         })
@@ -118,6 +122,3 @@ function aDept() {
     VALUES ('Security');`
 }
 
-//vDepts();
-//vRoles();
-//vEmps();
