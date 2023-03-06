@@ -1,5 +1,6 @@
 const inquirer = require('inquirer');
 const mysql = require('mysql2');
+require('console.table');
 
 
 //create list of menu options for application
@@ -104,7 +105,7 @@ function vDepts() {
 
 //show list of all roles
 function vRoles() {
-    const selRoles =`SELECT * FROM roles;`;
+    const selRoles =`SELECT r.role_id, r.title, r.salary, d.dept_name  FROM roles r LEFT JOIN departments d on r.dept_id=d.dept_id;`;
     db.query(selRoles, (err,res)=> {
         if (err) {
             console.log('Check your sql syntax');
@@ -158,7 +159,7 @@ async function aDept() {
 async function aRole() {
     const promptRole = await inquirer.prompt(inputRole());
     const insRole = `INSERT INTO roles (title, salary, dept_id) VALUES (?,?,?)`;
-    const newRole = [promptRole.title,promptRole.salary,promptRole.dept_id];
+    const newRole = [promptRole.title,promptRole.salary, promptRole.dept_id];
     db.query(insRole, newRole, (err,res) => {
         if (err) {console.log('Error. Check your sql syntax')
                 console.log(`${newRole}`);
@@ -173,10 +174,11 @@ async function aRole() {
 async function aEmp() {
     const promptEmp = await inquirer.prompt(inputEmp());
     const insEmp = `INSERT INTO employee (first_name, last_name, mgr_id, role_id) VALUES (?,?,?,?)`;
-    const newEmp = [promptEmp.first_name, promptEmp.last_name, promptEmp.mgr_id, promptEmp.role_id];
+    const newEmp = [promptEmp.first_name, promptEmp.last_name, promptEmp.mgr_id*1, promptEmp.role_id]
     db.query(insEmp, newEmp, (err,res) => {
         if (err) {console.log('Error. Check your sql syntax')
                 console.log(`${newEmp}`);
+                console.log(promptEmp.mgr_id);
         return;
     }
     console.log('New employee added successfuly');
